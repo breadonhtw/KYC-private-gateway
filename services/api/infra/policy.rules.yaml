@@ -1,0 +1,16 @@
+rules:
+  - id: R001
+    description: "NRIC/Passport must be tokenised"
+    match: ["NRIC","PASSPORT"]
+    action: "tokenise"
+    severity: "high"
+  - id: R002
+    description: "Bank Account numbers cannot be transmitted"
+    match: ["ACCOUNT_NUMBER"]
+    action: "block"
+    severity: "critical"
+  - id: R003
+    description: "Names must be tokenised"
+    match: ["PERSON_NAME"]
+    action: "tokenise"
+    severity: "high"
