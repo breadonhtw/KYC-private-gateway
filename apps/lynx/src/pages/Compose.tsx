@@ -117,40 +117,107 @@ export default function Compose() {
   }
 
   async function onSearchAndSummarise() {
+    alert("Function called!");
+    console.log("=== SEARCH & SUMMARISE DEBUG ===");
+    console.log("subjectToken:", subjectToken);
+    console.log("tokenised text:", tokenised);
+    console.log("policy level:", policy?.level);
+    console.log("API_BASE:", API_BASE);
+
     if (!subjectToken) {
-      alert(
-        "No SUBJECT_ token found. Ensure a person name was tokenised (SUBJECT_XXXX)."
+      console.log("❌ No subject token found");
+      console.log(
+        "All tokens in text:",
+        tokenised.match(/\b[A-Z]+_[A-Z0-9]{4,}\b/g)
       );
+      alert("No SUBJECT token found. Ensure a person name was tokenised.");
       return;
     }
+
+    console.log("✅ Subject token found:", subjectToken);
     setLoading("search");
     setAnswer("");
     setCitations([]);
     setSnippets([]);
 
     try {
-      const sr = await fetch(`${API_BASE}/search`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subjectToken }),
-      });
-      const sj = await sr.json();
-      setSnippets(sj.snippets ?? []);
-      await callAudit("search", { got: (sj.snippets ?? []).length });
+      console.log("🔍 Starting search request...");
+      const searchUrl = `${API_BASE}/search`;
+      const searchPayload = { subjectToken };
 
-      setLoading("summarise");
-      const rr = await fetch(`${API_BASE}/summarise`, {
+      console.log("Search URL:", searchUrl);
+      console.log("Search payload:", searchPayload);
+
+      const sr = await fetch(searchUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subjectToken, snippets: sj.snippets ?? [] }),
+        body: JSON.stringify(searchPayload),
       });
+
+      console.log("Search response status:", sr.status);
+      console.log("Search response ok:", sr.ok);
+
+      if (!sr.ok) {
+        const errorText = await sr.text();
+        console.error("❌ Search request failed:", errorText);
+        throw new Error(`Search failed: ${sr.status} ${errorText}`);
+      }
+
+      const sj = await sr.json();
+      console.log("✅ Search response:", sj);
+
+      const snippets = sj.snippets ?? [];
+      setSnippets(snippets);
+      console.log("📄 Snippets found:", snippets.length);
+
+      await callAudit("search", { got: snippets.length });
+
+      if (snippets.length === 0) {
+        console.log("⚠️ No snippets found, skipping summarise");
+        setLoading(null);
+        return;
+      }
+
+      console.log("🤖 Starting summarise request...");
+      setLoading("summarise");
+
+      const summariseUrl = `${API_BASE}/summarise`;
+      const summarisePayload = { subjectToken, snippets };
+
+      console.log("Summarise URL:", summariseUrl);
+      console.log("Summarise payload:", summarisePayload);
+
+      const rr = await fetch(summariseUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(summarisePayload),
+      });
+
+      console.log("Summarise response status:", rr.status);
+      console.log("Summarise response ok:", rr.ok);
+
+      if (!rr.ok) {
+        const errorText = await rr.text();
+        console.error("❌ Summarise request failed:", errorText);
+        throw new Error(`Summarise failed: ${rr.status} ${errorText}`);
+      }
+
       const rj = await rr.json();
+      console.log("✅ Summarise response:", rj);
+
       setAnswer(rj.answer ?? "");
       setCitations(rj.citations ?? []);
       await callAudit("summarise", {
         len: (rj.answer ?? "").length,
         cites: rj.citations ?? [],
       });
+
+      console.log("🎉 Search & Summarise completed successfully!");
+    } catch (error) {
+      console.error("❌ Search & Summarise failed:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      alert(`Error: ${errorMessage}`);
     } finally {
       setLoading(null);
     }
