@@ -1,5 +1,15 @@
 # KYC Private Gateway - API Setup
 
+## Problem Statement: Privacy Meets AI: Building a Safer Digital Future
+- PII Detection and Redaction for LLM Prompts
+- An application that automatically detects and redacts personally identifiable information (PII) in real time, tokenising PII and utilising them for internal searches on adverse media on individuals.
+
+## Functionality and features
+- Real-time PII detection system, which protects the privacy of individuals
+- LLM-powered tokenising system, which is used for internal searches of adverse media
+- LLM-powered search function, which summarises the adverse media regarding the individual in question
+- Allows institutions such as banks and universities to conduct background checks without leaking sensitive information through LLMs
+
 ## Prerequisites
 
 - Python 3.8+
