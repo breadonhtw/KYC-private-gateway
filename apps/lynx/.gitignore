@@ -12,6 +12,18 @@ dist
 dist-ssr
 *.local
 
+# API Keys and secrets (should never be in frontend anyway)
+.env
+*.env
+**/.env
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.key
+secrets/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
