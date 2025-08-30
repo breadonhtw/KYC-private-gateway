@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef } from "react"; 
+
 import PolicyBanner from "../shared/PolicyBanner";
 import RedactionDiff from "../shared/RedactionDiff";
 import AuditDrawer from "../shared/AuditDrawer";
@@ -20,6 +21,21 @@ export default function Compose() {
     reasons: string[];
     requiredActions: string[];
   } | null>(null);
+
+  const textRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const handleReset = () => {
+    setText("");
+    setEntities([]);
+    setTokenised("");
+    setPolicy(null);
+    setSnippets([]);
+    setAnswer("");
+    setCitations([]);
+    setPrevHash("");
+    setShowAudit(false);
+    if (textRef.current) textRef.current.focus();
+  };
   const [snippets, setSnippets] = useState<
     Array<{ id: string; textSanitised: string; source: string }>
   >([]);
@@ -251,6 +267,7 @@ export default function Compose() {
         </label>
         <textarea
           id="prompt"
+          ref={textRef}
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="e.g. Check adverse media on Tan Mei Ling, NRIC S1234567A, account 12-345-678"
@@ -280,7 +297,7 @@ export default function Compose() {
             onClick={onTokenise}
             disabled={loading !== null}
             style={btnStyle}
-          >
+          >  
             {loading === "tokenise" || loading === "policy"
               ? "Processing…"
               : "Tokenise & Check"}
@@ -299,6 +316,13 @@ export default function Compose() {
             style={{ ...btnStyle, background: "#444" }}
           >
             {showAudit ? "Hide Audit" : "Audit"}
+          </button>
+          <button
+            onClick={handleReset}
+            disabled={loading !== null}
+            style={{ ...btnStyle, background: "#dc2626" }}
+          >
+            Reset
           </button>
         </div>
 
