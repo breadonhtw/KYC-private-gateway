@@ -3,14 +3,8 @@ from hashlib import sha256
 
 PATTERNS = {
     "PERSON_NAME": re.compile(
-    r"\b"
-    r"([A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]{1,20}(?:[-'][A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]{1,20})?)"  # first name
-    r"(?:\s"  # space before next name part
-    r"([A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]{1,20}(?:[-'][A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]{1,20})?"  # middle/last name
-    r"|(?i:bin|binti|binte|van|von|de|del|da|dos|di|la|le|al))"  # common prefixes
-    r"){0,9}"  # allow up to 9 additional name parts
-    r"\b")
-    ,
+        r"\b((?:[A-Z][a-z]{1,20}(?:[-'][A-Z][a-z]{1,20})?)(?:\s(?:[A-Z][a-z]{1,20}(?:[-'][A-Z][a-z]{1,20})?|(?:(?i:bin|binti|binte|van|von|de|del|da|dos|di|la|le|al)))){1,5})\b"
+    ),
     "NRIC": re.compile(r"\b[STFG][ -]?\d{7}[ -]?[A-Z]\b", re.IGNORECASE),
     "ACCOUNT_NUMBER": re.compile(r"\b\d{3}[- ]?\d{3}[- ]?\d{3,}\b"),
     "EMAIL": re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+"),
