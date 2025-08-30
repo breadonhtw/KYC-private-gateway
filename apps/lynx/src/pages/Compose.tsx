@@ -100,10 +100,13 @@ export default function Compose() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tokenisedText: j.tokenisedText ?? "",
-          entityTypes: entities.map((e) => e.type),
+          tokenisedText: j.tokenisedText,
+          // 🔹 Map PHONE → PHONE_NUMBER for policy engine
+          entityTypes: entities.map((e) =>
+            e.type === "PHONE" ? "PHONE_NUMBER" : e.type
+          ),
         }),
-      });
+      }).then((r) => r.json());
       const pj = await p.json();
       setPolicy({
         level: pj.level,
