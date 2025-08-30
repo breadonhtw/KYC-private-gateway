@@ -1,0 +1,5 @@
+
+# API env & caches
+services/api/.venv/
+services/api/.env
+**/__pycache__/ 
