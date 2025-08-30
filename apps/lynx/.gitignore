@@ -14,6 +14,9 @@ dist-ssr
 
 # API Keys and secrets (should never be in frontend anyway)
 .env
+*.env
+**/.env
+.env
 .env.local
 .env.development
 .env.test
