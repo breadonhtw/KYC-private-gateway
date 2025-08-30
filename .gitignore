@@ -1,0 +1,10 @@
+
+# API env & caches
+services/api/.venv/
+services/api/.env
+**/__pycache__/ 
+
+# local env
+.env
+*.env
+
