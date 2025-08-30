@@ -117,7 +117,6 @@ export default function Compose() {
   }
 
   async function onSearchAndSummarise() {
-    alert("Function called!");
     console.log("=== SEARCH & SUMMARISE DEBUG ===");
     console.log("subjectToken:", subjectToken);
     console.log("tokenised text:", tokenised);
@@ -130,7 +129,7 @@ export default function Compose() {
         "All tokens in text:",
         tokenised.match(/\b[A-Z]+_[A-Z0-9]{4,}\b/g)
       );
-      alert("No SUBJECT token found. Ensure a person name was tokenised.");
+      alert("No SUBJ token found. Ensure a person name was tokenised.");
       return;
     }
 
@@ -226,25 +225,28 @@ export default function Compose() {
   const canSend = policy?.level === "green";
 
   return (
-    <div style={{ display: "grid", gap: 16 }}>
-      <section style={{ display: "grid", gap: 12 }}>
+    <div style={{ display: "grid", gap: 12 }}>
+      {/* Input Section */}
+      <section style={{ display: "grid", gap: 10 }}>
         <label htmlFor="prompt" style={{ fontSize: 14, opacity: 0.9 }}>
-          Enter analyst prompt (raw):
+          Enter analyst prompt:
         </label>
         <textarea
           id="prompt"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={`e.g. Check adverse media on Tan Mei Ling, NRIC S1234567A, account 12-345-678`}
+          placeholder="e.g. Check adverse media on Tan Mei Ling, NRIC S1234567A, account 12-345-678"
           style={{
             width: "100%",
-            minHeight: 140,
+            minHeight: 100,
             padding: 12,
-            borderRadius: 10,
+            borderRadius: 8,
             border: "1px solid #30363d",
             background: "#0e1116",
             color: "#e6edf3",
             fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+            fontSize: 13,
+            resize: "vertical",
           }}
         />
 
@@ -262,7 +264,7 @@ export default function Compose() {
             style={btnStyle}
           >
             {loading === "tokenise" || loading === "policy"
-              ? "Tokenising…"
+              ? "Processing…"
               : "Tokenise & Check"}
           </button>
           <button
@@ -278,30 +280,35 @@ export default function Compose() {
             onClick={() => setShowAudit((s) => !s)}
             style={{ ...btnStyle, background: "#444" }}
           >
-            {showAudit ? "Hide Audit" : "Show Audit"}
+            {showAudit ? "Hide Audit" : "Audit"}
           </button>
         </div>
 
         <PolicyBanner policy={policy} />
       </section>
 
-      <section style={cardStyle}>
-        <h3 style={h3Style}>Redaction Diff</h3>
-        <RedactionDiff
-          original={text}
-          tokenised={tokenised}
-          entities={entities}
-        />
-      </section>
+      {/* Conditional Sections - Only show when there's content */}
+      {entities.length > 0 && (
+        <section style={cardStyle}>
+          <h3 style={h3Style}>PII Detection & Redaction</h3>
+          <RedactionDiff
+            original={text}
+            tokenised={tokenised}
+            entities={entities}
+          />
+        </section>
+      )}
 
-      <section style={cardStyle}>
-        <h3 style={h3Style}>LLM Result</h3>
-        <Result answer={answer} citations={citations} snippets={snippets} />
-      </section>
+      {(answer || snippets.length > 0) && (
+        <section style={cardStyle}>
+          <h3 style={h3Style}>Results</h3>
+          <Result answer={answer} citations={citations} snippets={snippets} />
+        </section>
+      )}
 
       {showAudit && (
         <section style={cardStyle}>
-          <h3 style={h3Style}>Audit</h3>
+          <h3 style={h3Style}>Audit Trail</h3>
           <AuditDrawer caseId={caseId} />
         </section>
       )}
@@ -312,21 +319,22 @@ export default function Compose() {
 const btnStyle: React.CSSProperties = {
   background: "#1f6feb",
   color: "white",
-  padding: "10px 14px",
+  padding: "8px 12px",
   border: "none",
-  borderRadius: 8,
+  borderRadius: 6,
   cursor: "pointer",
+  fontSize: 13,
 };
 
 const cardStyle: React.CSSProperties = {
   background: "#0e1116",
   border: "1px solid #30363d",
-  borderRadius: 12,
-  padding: 16,
+  borderRadius: 8,
+  padding: 12,
 };
 
 const h3Style: React.CSSProperties = {
-  margin: "0 0 10px 0",
-  fontSize: 16,
+  margin: "0 0 8px 0",
+  fontSize: 14,
   opacity: 0.9,
 };
